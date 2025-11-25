@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Portfolio - Eng. Muhannad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background-color: #0c0a09; /* Near-black for deep contrast */
+            color: #f3f4f6;
+            scroll-behavior: smooth;
+        }
+        
+        /* 3D Canvas Styling */
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.3; /* Subtle transparency */
+        }
+        
+        /* Content Card: Elevated, Glassmorphic Feel */
+        .content-card {
+            background-color: rgba(255, 255, 255, 0.05); /* Very light background */
+            backdrop-filter: blur(12px); /* Blur effect for professionalism */
+            border: 1px solid rgba(139, 92, 246, 0.3); /* Soft violet border */
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.5s;
+        }
+
+        /* Hover Effect: Soft Lift and Shadow */
+        .content-card:hover {
+            transform: translateY(-8px) rotateX(1deg); /* Slight 3D lift */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 10px rgba(139, 92, 246, 0.8);
+        }
+
+        /* Certificate and Project Image Styling */
+        .certificate-image {
+            flex-shrink: 0;
+            width: 140px; /* Slightly larger image */
+            height: 140px;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 0.75rem;
+            border: 3px solid #6d28d9; /* Deep violet border */
+        }
+        
+        .project-image-container {
+            width: 100%;
+            padding-top: 75%; 
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .project-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .project-image-container:hover .project-image {
+            transform: scale(1.1); /* Zoom effect on hover */
+        }
+        
+        
+        /* Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 50; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.95); /* Darker backdrop */
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90%;
+            object-fit: contain; 
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: #d8b4fe;
+            font-size: 50px;
+            font-weight: 300;
+            transition: 0.3s;
+        }
+        .modal-close:hover,
+        .modal-close:focus {
+            color: #ffffff;
+            text-decoration: none;
+            cursor: pointer;
+            transform: scale(1.1);
+        }
+#stars-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+        /* Custom animation for Hero text */
+        @keyframes pulse-gradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .animated-gradient-text {
+            background-size: 200% 200%;
+            animation: pulse-gradient 6s ease infinite;
+        }
+
+        /* Hidden class for Scroll Reveal */
+        .hidden-reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .visible-reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <canvas id="hero-canvas"></canvas>
+    <canvas id="stars-canvas"></canvas>
+
+
+    <div id="image-modal" class="modal">
+        <span class="modal-close" id="modal-close">&times;</span>
+        <img class="modal-content" id="modal-image">
+    </div>
+
+    <main class="relative z-10">
+
+        <header class="sticky top-0 bg-black/70 backdrop-blur-md p-4 border-b border-violet-900/50 z-20 shadow-xl">
+            <nav class="max-w-7xl mx-auto flex justify-between items-center">
+                <a href="#" class="text-3xl font-extrabold text-violet-400 hover:text-white transition duration-500 tracking-wider">
+                    Portfolio
+                </a>
+                <div class="space-x-8 flex">
+                    <a href="#about" class="text-gray-300 hover:text-violet-400 hover:underline underline-offset-4 transition font-medium">About</a>
+                    <a href="#skills" class="text-gray-300 hover:text-violet-400 hover:underline underline-offset-4 transition font-medium">Skills</a>
+                    <a href="#certificates" class="text-gray-300 hover:text-violet-400 hover:underline underline-offset-4 transition font-medium">Certificates</a>
+                    <a href="#projects" class="text-gray-300 hover:text-violet-400 hover:underline underline-offset-4 transition font-medium">Projects</a>
+                    <a href="#contact" class="text-gray-300 hover:text-violet-400 hover:underline underline-offset-4 transition font-medium">Contact</a>
+                </div>
+            </nav>
+        </header>
+
+        <section id="hero" class="min-h-screen flex flex-col justify-center items-center text-center p-8 relative">
+            <div class="max-w-5xl space-y-8">
+                <h1 class="text-6xl sm:text-7xl lg:text-9xl font-extrabold tracking-tight">
+                    <span class="block text-gray-200 mb-4 text-3xl sm:text-4xl">Hello, I'm</span>
+                    <span class="block bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-500 to-pink-500 animated-gradient-text">
+                        Eng. Muhannad 💻
+                    </span>
+                </h1>
+                <p class="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto font-light animate-fade-in delay-500">
+                    A **Full Stack Developer** focused on crafting efficient, scalable, and data-centric web solutions using modern technologies and best development practices.                
+                </p>
+                <div class="pt-8">
+                    <a href="#projects" class="inline-flex items-center space-x-2 px-10 py-4 text-xl font-bold text-white bg-violet-700 rounded-full shadow-2xl hover:bg-violet-600 transition duration-500 transform hover:scale-105 border border-violet-400/50">
+                        View My Work <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="py-32 p-8 overflow-hidden">
+            <div class="max-w-5xl mx-auto hidden-reveal">
+                <h2 class="text-4xl font-extrabold mb-12 text-center text-violet-400 flex items-center justify-center space-x-3">
+                    <i class="fas fa-user-circle"></i> <span>About Me</span>
+                </h2>
+                
+                <div class="content-card rounded-2xl p-10 shadow-3xl grid md:grid-cols-3 gap-10 items-center">
+                    
+                    <div class="md:col-span-1 flex justify-center">
+                        <img 
+                            src="public/profile.jpeg" 
+                            alt="Professional Portrait" 
+                            class="w-56 h-56 object-cover rounded-full border-4 border-fuchsia-500 shadow-xl transform hover:scale-105 transition duration-700 cursor-pointer"
+                            onerror="this.onerror=null; this.src='https://placehold.co/250x250/1e293b/d8b4fe?text=Profile+Image';"
+                            onclick="openModal('public/profile.jpeg')"
+                        >
+                    </div>
+
+                    <div class="md:col-span-2 text-center md:text-left space-y-6">
+                        <p class="text-xl leading-relaxed text-gray-300">
+                            I’m a **Software Engineer** passionate about developing efficient, scalable, and user-focused applications.
+                        </p>
+                        <p class="text-lg leading-relaxed text-gray-400 border-l-4 border-violet-500 pl-4 italic">
+                            I specialize in building and supporting software solutions using modern technologies, with a strong focus on **problem-solving**, **system optimization**, and **data-driven decision-making**. I’m always eager to learn, improve, and contribute to innovative projects that make a real impact.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="max-w-5xl mx-auto border-violet-900/50">
+
+        <section id="skills" class="py-32 p-8 overflow-hidden">
+            <div class="max-w-5xl mx-auto hidden-reveal">
+                <h2 class="text-4xl font-extrabold mb-16 text-center text-violet-400 flex items-center justify-center space-x-3">
+                    <i class="fas fa-cogs"></i> <span>Core Skills & Expertise</span>
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                        <i class="fas fa-paint-brush text-4xl text-fuchsia-400 mb-4"></i>
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Frontend</h3>
+                        <p class="text-gray-400 font-light">React, Vue, Tailwind CSS, HTML5/CSS3</p>
+                    </div>
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                        <i class="fas fa-server text-4xl text-fuchsia-400 mb-4"></i>
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Backend</h3>
+                        <p class="text-gray-400 font-light">Node.js, Python/Django, REST/GraphQL APIs</p>
+                    </div>
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                        <i class="fas fa-database text-4xl text-fuchsia-400 mb-4"></i>
+                        <h3 class="text-2xl font-semibold mb-2 text-white">Database</h3>
+                        <p class="text-gray-400 font-light">PostgreSQL, MongoDB, SQL/NoSQL Optimization</p>
+                    </div>
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                        <i class="fas fa-cloud text-4xl text-fuchsia-400 mb-4"></i>
+                        <h3 class="text-2xl font-semibold mb-2 text-white">DevOps & Cloud</h3>
+                        <p class="text-gray-400 font-light">Docker, AWS/GCP, CI/CD Pipelines</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="max-w-5xl mx-auto border-violet-900/50">
+
+        <section id="certificates" class="py-32 p-8 overflow-hidden">
+            <div class="max-w-5xl mx-auto hidden-reveal">
+                <h2 class="text-4xl font-extrabold mb-12 text-center text-violet-400 flex items-center justify-center space-x-3">
+                    <i class="fas fa-award"></i> <span>Certificates & Training</span>
+                </h2>
+                
+                <div class="grid md:grid-cols-2 gap-10">
+                    
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                        <img src="Certificates1/AWS Certified DevOps Engineer - Professional (DOP-C02) Exam Tips.jpg" alt="AWS Certificate" class="rounded-lg certificate-image cursor-pointer"
+                            onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+1';"
+                            onclick="openModal(this.src)">
+                        
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-violet-300 mb-1">AWS Certified DevOps Engineer - Professional (DOP-C02)</h3>
+                            <p class="text-gray-500 text-sm mb-3">Issued by Linkedin | Date: [ 8, 2025]</p>
+                            <p class="text-gray-400 text-sm">
+                                Completed advanced training on AWS Certified DevOps Engineer - Professional (DOP-C02) exam preparation, enhancing DevOps skills and AWS service knowledge.  
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                        <img src="Certificates1/comTIA A core 1(220-1101).jpg" alt="CompTIA Certificate" class="rounded-lg certificate-image cursor-pointer"
+                            onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+2';"
+                            onclick="openModal(this.src)">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-violet-300 mb-1">CompTIA A+ Core 1 (220-1101)</h3>
+                            <p class="text-gray-500 text-sm mb-3">Issued by Linkedin | Date: [ 8, 2025 ]</p>
+                            <p class="text-gray-400 text-sm">
+                                Completed preparation course for CompTIA A+ Core 1, validating foundational knowledge in IT support and hardware maintenance.                                
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                        <img src="Certificates1/Excel Management Accounting.jpg" alt="Excel Certificate" class="rounded-lg certificate-image cursor-pointer"
+                            onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+3';"
+                            onclick="openModal(this.src)">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-violet-300 mb-1">Excel Management Accounting</h3>
+                            <p class="text-gray-500 text-sm mb-3">Issued by Linkedin | Date: [ 5, 2025 ]</p>
+                            <p class="text-gray-400 text-sm">
+                                Completed a specialized course on leveraging Excel for Management Accounting, demonstrating competence in financial analysis using digital tools.                                
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                        <img src="Certificates1/Foundations of Cybersecurity.png" alt="Cybersecurity Certificate" class="rounded-lg certificate-image cursor-pointer"
+                            onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+4';"
+                            onclick="openModal(this.src)">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-violet-300 mb-1">Foundations of Cybersecurity</h3>
+                            <p class="text-gray-500 text-sm mb-3">Issued by Google | Date: [ 3, 2025]</p>
+                            <p class="text-gray-400 text-sm">
+                                Completed Google's "Foundations of Cybersecurity" course, demonstrating proficiency in core information security and protection concepts.                                
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                        <img src="Certificates1/Foundations of User Experience (UX) Design.png" alt="UX Certificate" class="rounded-lg certificate-image cursor-pointer"
+                            onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+5';"
+                            onclick="openModal(this.src)">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-violet-300 mb-1">Foundations of User Experience (UX) Design</h3>
+                            <p class="text-gray-500 text-sm mb-3">Issued by Google | Date: [ 4, 2024]</p>
+                            <p class="text-gray-400 text-sm">
+                                Completed Google's "Foundations of User Experience (UX) Design" course, focusing on principles for creating user-friendly interfaces.                                
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                        <img src="Certificates1/Red Hat System administration l (RH125).jpg" alt="Red Hat Certificate" class="rounded-lg certificate-image cursor-pointer"
+                            onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+6';"
+                            onclick="openModal(this.src)">
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold text-violet-300 mb-1">Red Hat System Administration I (RH125)</h3>
+                            <p class="text-gray-500 text-sm mb-3">Issued by Red Hat | Date: [ 3, 2024]</p>
+                            <p class="text-gray-400 text-sm">
+                                Successfully attended and completed the Red Hat System Administration I course, strengthening expertise in Linux operating system management.                                
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <hr class="max-w-5xl mx-auto border-violet-900/50">
+
+        <section id="projects" class="py-32 bg-black/50 p-8 overflow-hidden">
+            <div class="max-w-5xl mx-auto hidden-reveal">
+                <h2 class="text-4xl font-extrabold mb-16 text-center text-violet-400 flex items-center justify-center space-x-3">
+                    <i class="fas fa-desktop"></i> <span>Featured Projects</span>
+                </h2>
+                <div class="space-y-16"> 
+                
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                        <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🤖 AI Business Dashboard</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="project-image-container" onclick="openModal('public/s2.jpg')">
+                                <img src="public/s2.jpg" alt="Project 1 Main Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+1+A';"
+                                    >
+                            </div>
+                            <div class="project-image-container" onclick="openModal('public/s1.jpg')">
+                                <img src="public/s1.jpg" alt="Project 1 Secondary Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+1+B';"
+                                    >
+                            </div>
+                        </div>
+
+                        <p class="text-gray-300 text-lg leading-relaxed">
+                            Core Achievement: Built a fully autonomous workflow to create a dynamic AI Business Dashboard, successfully transforming daily reporting from a manual task into an **intelligent, automated process**.
+                        </p>
+                        <div>
+                            <span class="tag-badge bg-violet-700">Workflow Design</span>
+                            <span class="tag-badge bg-violet-700">AI Agent Prompt Engineering</span>
+                            <span class="tag-badge bg-violet-700">Data Mapping</span>
+                        </div>
+                    </div>
+
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                        <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🛠️ Personal Car Tools E-commerce Store (Full-Stack)</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="project-image-container" onclick="openModal('public/s3.jpg')">
+                                <img src="public/s3.jpg" alt="Project 2 Main Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+2+A';"
+                                    >
+                            </div>
+                            <div class="project-image-container" onclick="openModal('public/s4.jpg')">
+                                <img src="public/s4.jpg" alt="Project 2 Secondary Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+2+B';"
+                                    >
+                            </div>
+                        </div>
+
+                        <p class="text-gray-300 text-lg leading-relaxed">
+                            A personal project to apply your experience as a Software Engineer in developing a comprehensive web application/e-commerce store for car tools, featuring secure transactions and user management.
+                        </p>
+                        <div>
+                            <span class="tag-badge bg-violet-700">Firebase Authentication</span>
+                            <span class="tag-badge bg-violet-700">HTML, CSS, JavaScript</span>
+                            <span class="tag-badge bg-violet-700">Full-Stack Integration</span>
+                        </div>
+                    </div>
+                    
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                        <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🅿️ Smart Parking System</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="project-image-container" onclick="openModal('public/s5.jpg')">
+                                <img src="public/s5.jpg" alt="Project 3 Main Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+3+A';"
+                                    >
+                            </div>
+                            <div class="project-image-container" onclick="openModal('public/s6.jpg')">
+                                <img src="public/s6.jpg" alt="Project 3 Secondary Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+3+B';"
+                                    >
+                            </div>
+                        </div>
+
+                        <p class="text-gray-300 text-lg leading-relaxed">
+                            A system utilizing sensors and technology to manage parking spaces efficiently, providing **real-time occupancy data** to users and reducing traffic congestion.
+                        </p>
+                        <div>
+                            <span class="tag-badge bg-violet-700">Sensor Management</span>
+                            <span class="tag-badge bg-violet-700">Firebase</span>
+                            <span class="tag-badge bg-violet-700">Real-Time Data Processing</span>
+                        </div>
+                    </div>
+
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                        <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🏡 HomeTouch Android Application</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="project-image-container" onclick="openModal('public/s7.jpg')">
+                                <img src="public/s7.jpg" alt="Project 4 Main Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+4+A';"
+                                    >
+                            </div>
+                            <div class="project-image-container" onclick="openModal('public/s8.jpg')">
+                                <img src="public/s8.jpg" alt="Project 4 Secondary Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+4+B';"
+                                    >
+                            </div>
+                        </div>
+
+                        <p class="text-gray-300 text-lg leading-relaxed">
+                            A comprehensive **Android mobile application** designed to connect users with interior designers and related service providers, built with native mobile development tools.
+                        </p>
+                        <div>
+                            <span class="tag-badge bg-violet-700">Android Dev (Java/Kotlin)</span>
+                            <span class="tag-badge bg-violet-700">Firebase & REST API</span>
+                            <span class="tag-badge bg-violet-700">Jetpack Components</span>
+                        </div>
+                    </div>
+                    
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                        <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">📄 InfoPath and SharePoint Form Automation</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="project-image-container" onclick="openModal('public/infopath_main.jpg')">
+                                <img src="public/s9.PNG" alt="Project 5 Main Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+5+A';"
+                                    >
+                            </div>
+                            <div class="project-image-container" onclick="openModal('public/sharepoint_list.jpg')">
+                                <img src="public/s10.PNG" alt="Project 5 Secondary Image" class="project-image"
+                                    onerror="this.onerror=null; this.src='https://placehold.co/600x450/1e293b/d8b4fe?text=Project+5+B';"
+                                    >
+                            </div>
+                        </div>
+
+                        <p class="text-gray-300 text-lg leading-relaxed">
+                            Developed and deployed automated workflows using **InfoPath and SharePoint** to streamline internal business processes, improving data accuracy and reducing manual processing time.
+                        </p>
+                        <div>
+                            <span class="tag-badge bg-violet-700">InfoPath Design</span>
+                            <span class="tag-badge bg-violet-700">SharePoint Administration</span>
+                            <span class="tag-badge bg-violet-700">Workflow Automation</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        
+        <hr class="max-w-5xl mx-auto border-violet-900/50">
+
+        <section id="contact" class="py-32 p-8 overflow-hidden">
+            <div class="max-w-4xl mx-auto text-center hidden-reveal">
+                <h2 class="text-4xl font-extrabold mb-10 text-violet-400 flex items-center justify-center space-x-3">
+                    <i class="fas fa-paper-plane"></i> <span>Get In Touch</span>
+                </h2>
+                <p class="text-xl text-gray-400 mb-12">
+                    I’m currently open to new opportunities and collaboration. Let’s build something great together.
+                </p>
+                <div class="flex flex-wrap justify-center gap-8">
+                    <a href="mailto:Engmuhannad23@hotmail.com" class="inline-flex items-center space-x-3 px-8 py-4 text-lg font-bold text-white bg-fuchsia-600 rounded-full shadow-2xl hover:bg-fuchsia-500 transition duration-500 transform hover:scale-105 border border-fuchsia-400/50">
+                        <i class="fas fa-envelope"></i> <span>Send an Email</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/muhannad-althagafi/" target="_blank" class="inline-flex items-center space-x-3 px-8 py-4 text-lg font-bold text-violet-400 border-2 border-violet-400 rounded-full shadow-2xl hover:bg-violet-900/50 transition duration-500 transform hover:scale-105">
+                        <i class="fab fa-linkedin"></i> <span>LinkedIn Profile</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="p-8 text-center text-gray-500 border-t border-violet-900/50">
+        <p>&copy; 2025 Muhannad althagafi. Crafted with <span class="text-fuchsia-500">&hearts;</span> and Code.</p>
+    </footer>
+
+
+    <script>
+        // --- 1. Modal Functionality (Image Lightbox) ---
+
+        const modal = document.getElementById("image-modal");
+        const modalImg = document.getElementById("modal-image");
+        const closeModal = document.getElementById("modal-close");
+
+        function openModal(src) {
+            modal.style.display = "flex"; 
+            modal.style.alignItems = "center";
+            modal.style.justifyContent = "center";
+            modalImg.src = src;
+        }
+
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Attach modal function to all certificate images (for clean code)
+        document.querySelectorAll('.certificate-image').forEach(img => {
+            img.addEventListener('click', () => {
+                openModal(img.src);
+            });
+        });
+
+
+        // --- 2. Three.js Simple Animation (Hero Background) ---
+        // Enhanced 3D object for better visual depth
+
+        if (typeof THREE !== 'undefined') {
+            const canvas = document.getElementById('hero-canvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio); 
+
+            // Lighting: Subtle directional light
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(5, 5, 5);
+            scene.add(directionalLight);
+
+            const ambientLight = new THREE.AmbientLight(0x404040, 3); 
+            scene.add(ambientLight);
+
+            // Geometry and Material (Icosahedron for more complexity)
+            const geometry = new THREE.IcosahedronGeometry(2, 1); // Size 2, detail 1
+            const material = new THREE.MeshPhongMaterial({ 
+                color: 0x8b5cf6, // Violet-500
+                emissive: 0x5b21b6, // Deep violet
+                specular: 0xec4899, // Pink/Fuchsia for highlights
+                shininess: 50,
+                wireframe: true 
+            });
+
+            const icosahedron = new THREE.Mesh(geometry, material);
+            scene.add(icosahedron);
+
+            camera.position.z = 7;
+
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                icosahedron.rotation.x += 0.0005;
+                icosahedron.rotation.y += 0.001;
+                icosahedron.rotation.z += 0.0007;
+
+                // Simple sine wave movement for depth perception
+                icosahedron.position.x = Math.sin(Date.now() * 0.0003) * 0.5;
+                icosahedron.position.y = Math.cos(Date.now() * 0.0005) * 0.5;
+
+                renderer.render(scene, camera);
+            }
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+
+                renderer.setSize(width, height);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            });
+
+            animate();
+        } else {
+            console.error("Three.js is not loaded. The 3D background will not render.");
+        }
+
+// ----------------------
+// Galaxy Background Motion
+// ----------------------
+const starsCanvas = document.getElementById("stars-canvas");
+const starsCtx = starsCanvas.getContext("2d");
+
+let w, h;
+let particles = [];
+
+function initStarsCanvas() {
+    w = starsCanvas.width = window.innerWidth;
+    h = starsCanvas.height = window.innerHeight;
+
+    particles = [];
+
+    for (let i = 0; i < 350; i++) {
+        particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            z: Math.random() * 2 + 0.2,
+            size: Math.random() * 1.8,
+            color: `rgba(180, 80, 255, ${Math.random() * 0.8})`
+        });
+    }
+}
+initStarsCanvas();
+
+function renderGalaxy() {
+    starsCtx.clearRect(0, 0, w, h);
+
+    particles.forEach(p => {
+        p.x += (0.2 * p.z);
+        p.y += (0.1 * p.z);
+
+        if (p.x > w) p.x = 0;
+        if (p.y > h) p.y = 0;
+
+        starsCtx.beginPath();
+        starsCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        starsCtx.fillStyle = p.color;
+        starsCtx.fill();
+    });
+
+    requestAnimationFrame(renderGalaxy);
+}
+
+renderGalaxy();
+
+window.addEventListener("resize", initStarsCanvas);
+
+        // --- 3. Scroll Reveal Animation Functionality ---
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible-reveal');
+                    entry.target.classList.remove('hidden-reveal');
+                    // Stop observing after the element is visible
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, {
+            // Options: when 10% of the element is visible, trigger the animation
+            threshold: 0.1 
+        });
+
+        document.querySelectorAll('.hidden-reveal').forEach(element => {
+            observer.observe(element);
+        });
+
+    </script>
+</body>
+</html>
