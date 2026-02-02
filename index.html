@@ -7,26 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- GSAP Core & Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
 
     <style>
         /* Base Styles */
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background-color: #0c0a09; /* Near-black for deep contrast */
-            color: #f3f4f6;
+            background-color: lab(2.75381 0 0); /* Dark red/black background using lab color */
+            color: lab(98.26 0 0);
             scroll-behavior: smooth;
         }
         
-        /* 3D Canvas Styling */
+        /* 3D Canvas Styling - Disabled for performance */
         #hero-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.3; /* Subtle transparency */
+            display: none;
         }
         
         /* Content Card: Elevated, Glassmorphic Feel */
@@ -116,13 +115,23 @@
             transform: scale(1.1);
         }
 #stars-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
+    display: none; /* Disabled for performance */
 }
+
+        /* Video Background Styling */
+        #background-video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.4; /* Adjust opacity for better text readability */
+        }
 
         /* Custom animation for Hero text */
         @keyframes pulse-gradient {
@@ -135,21 +144,62 @@
             animation: pulse-gradient 6s ease infinite;
         }
 
-        /* Hidden class for Scroll Reveal */
-        .hidden-reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 1s ease-out, transform 1s ease-out;
+        /* Tag Badge Styling - Previously Missing */
+        .tag-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #f3f4f6;
+            transition: all 0.3s ease;
         }
 
-        .visible-reveal {
-            opacity: 1;
-            transform: translateY(0);
+        .tag-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.5);
+        }
+
+        /* GSAP Animation Classes - Initial states for animations */
+        .gsap-fade-in {
+            /* Will be animated by GSAP - no initial opacity needed */
+        }
+
+        .gsap-slide-up {
+            /* Will be animated by GSAP - no initial opacity needed */
+        }
+
+        .gsap-slide-left {
+            /* Will be animated by GSAP - no initial opacity needed */
+        }
+
+        .gsap-slide-right {
+            /* Will be animated by GSAP - no initial opacity needed */
+        }
+
+        .gsap-scale {
+            /* Will be animated by GSAP - no initial opacity needed */
+        }
+
+        /* Smooth Cursor */
+        body {
+            cursor: default;
+        }
+
+        a, button, .cursor-pointer {
+            cursor: pointer;
         }
 
     </style>
 </head>
 <body class="antialiased">
+
+    <!-- Video Background -->
+    <video autoplay muted loop playsinline id="background-video">
+        <source src="background video/background 1.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
     <canvas id="hero-canvas"></canvas>
     <canvas id="stars-canvas"></canvas>
@@ -162,7 +212,7 @@
 
     <main class="relative z-10">
 
-        <header class="sticky top-0 bg-black/70 backdrop-blur-md p-4 border-b border-violet-900/50 z-20 shadow-xl">
+        <header class="sticky top-0 bg-transparent p-4 border-b border-transparent z-20">
             <nav class="max-w-7xl mx-auto flex justify-between items-center">
                 <a href="#" class="text-3xl font-extrabold text-violet-400 hover:text-white transition duration-500 tracking-wider">
                     Portfolio
@@ -197,7 +247,7 @@
         </section>
 
         <section id="about" class="py-32 p-8 overflow-hidden">
-            <div class="max-w-5xl mx-auto hidden-reveal">
+            <div class="max-w-5xl mx-auto gsap-fade-in">
                 <h2 class="text-4xl font-extrabold mb-12 text-center text-violet-400 flex items-center justify-center space-x-3">
                     <i class="fas fa-user-circle"></i> <span>About Me</span>
                 </h2>
@@ -229,27 +279,27 @@
         <hr class="max-w-5xl mx-auto border-violet-900/50">
 
         <section id="skills" class="py-32 p-8 overflow-hidden">
-            <div class="max-w-5xl mx-auto hidden-reveal">
+            <div class="max-w-5xl mx-auto gsap-fade-in">
                 <h2 class="text-4xl font-extrabold mb-16 text-center text-violet-400 flex items-center justify-center space-x-3">
                     <i class="fas fa-cogs"></i> <span>Core Skills & Expertise</span>
                 </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center" id="skills-grid">
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center gsap-scale">
                         <i class="fas fa-paint-brush text-4xl text-fuchsia-400 mb-4"></i>
                         <h3 class="text-2xl font-semibold mb-2 text-white">Frontend</h3>
                         <p class="text-gray-400 font-light">React, Vue, Tailwind CSS, HTML5/CSS3</p>
                     </div>
-                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center gsap-scale">
                         <i class="fas fa-server text-4xl text-fuchsia-400 mb-4"></i>
                         <h3 class="text-2xl font-semibold mb-2 text-white">Backend</h3>
                         <p class="text-gray-400 font-light">Node.js, Python/Django, REST/GraphQL APIs</p>
                     </div>
-                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center gsap-scale">
                         <i class="fas fa-database text-4xl text-fuchsia-400 mb-4"></i>
                         <h3 class="text-2xl font-semibold mb-2 text-white">Database</h3>
                         <p class="text-gray-400 font-light">PostgreSQL, MongoDB, SQL/NoSQL Optimization</p>
                     </div>
-                    <div class="content-card rounded-xl p-8 flex flex-col items-center">
+                    <div class="content-card rounded-xl p-8 flex flex-col items-center gsap-scale">
                         <i class="fas fa-cloud text-4xl text-fuchsia-400 mb-4"></i>
                         <h3 class="text-2xl font-semibold mb-2 text-white">DevOps & Cloud</h3>
                         <p class="text-gray-400 font-light">Docker, AWS/GCP, CI/CD Pipelines</p>
@@ -261,14 +311,14 @@
         <hr class="max-w-5xl mx-auto border-violet-900/50">
 
         <section id="certificates" class="py-32 p-8 overflow-hidden">
-            <div class="max-w-5xl mx-auto hidden-reveal">
+            <div class="max-w-5xl mx-auto gsap-fade-in">
                 <h2 class="text-4xl font-extrabold mb-12 text-center text-violet-400 flex items-center justify-center space-x-3">
                     <i class="fas fa-award"></i> <span>Certificates & Training</span>
                 </h2>
                 
-                <div class="grid md:grid-cols-2 gap-10">
+                <div class="grid md:grid-cols-2 gap-10" id="certificates-grid">
                     
-                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6 gsap-slide-up">
                         <img src="Certificates1/AWS Certified DevOps Engineer - Professional (DOP-C02) Exam Tips.jpg" alt="AWS Certificate" class="rounded-lg certificate-image cursor-pointer"
                             onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+1';"
                             onclick="openModal(this.src)">
@@ -282,7 +332,7 @@
                         </div>
                     </div>
                     
-                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6 gsap-slide-up">
                         <img src="Certificates1/comTIA A core 1(220-1101).jpg" alt="CompTIA Certificate" class="rounded-lg certificate-image cursor-pointer"
                             onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+2';"
                             onclick="openModal(this.src)">
@@ -295,7 +345,7 @@
                         </div>
                     </div>
 
-                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6 gsap-slide-up">
                         <img src="Certificates1/Excel Management Accounting.jpg" alt="Excel Certificate" class="rounded-lg certificate-image cursor-pointer"
                             onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+3';"
                             onclick="openModal(this.src)">
@@ -308,7 +358,7 @@
                         </div>
                     </div>
 
-                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6 gsap-slide-up">
                         <img src="Certificates1/Foundations of Cybersecurity.png" alt="Cybersecurity Certificate" class="rounded-lg certificate-image cursor-pointer"
                             onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+4';"
                             onclick="openModal(this.src)">
@@ -321,7 +371,7 @@
                         </div>
                     </div>
                     
-                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6 gsap-slide-up">
                         <img src="Certificates1/Foundations of User Experience (UX) Design.png" alt="UX Certificate" class="rounded-lg certificate-image cursor-pointer"
                             onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+5';"
                             onclick="openModal(this.src)">
@@ -334,7 +384,7 @@
                         </div>
                     </div>
 
-                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6">
+                    <div class="content-card rounded-xl p-6 shadow-2xl flex items-start space-x-6 gsap-slide-up">
                         <img src="Certificates1/Red Hat System administration l (RH125).jpg" alt="Red Hat Certificate" class="rounded-lg certificate-image cursor-pointer"
                             onerror="this.onerror=null; this.src='https://placehold.co/140x140/1e293b/d8b4fe?text=Cert+6';"
                             onclick="openModal(this.src)">
@@ -354,13 +404,13 @@
         <hr class="max-w-5xl mx-auto border-violet-900/50">
              
         <section id="projects" class="py-32 bg-black/50 p-8 overflow-hidden">
-            <div class="max-w-5xl mx-auto hidden-reveal">
+            <div class="max-w-5xl mx-auto gsap-fade-in">
                 <h2 class="text-4xl font-extrabold mb-16 text-center text-violet-400 flex items-center justify-center space-x-3">
                     <i class="fas fa-desktop"></i> <span>Featured Projects</span>
                 </h2>
-                <div class="space-y-16"> 
+                <div class="space-y-16" id="projects-container"> 
                 
-                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🤖 AI Business Dashboard</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
@@ -385,7 +435,7 @@
                             <span class="tag-badge bg-violet-700">Data Mapping</span>
                         </div>
                     </div>
-          <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+          <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🤖 Saudi AI Assistant – Voice & Chat Intelligence System</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
@@ -418,7 +468,7 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
                             <span class="tag-badge bg-violet-700">Prompt Engineering</span>
                         </div>
                     </div>
-                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🛠️ Personal Car Tools E-commerce Store (Full-Stack)</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
@@ -444,7 +494,7 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
                         </div>
                     </div>
                     
-                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🅿️ Smart Parking System</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
@@ -470,7 +520,7 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
                         </div>
                     </div>
 
-                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🏡 HomeTouch Android Application</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
@@ -496,7 +546,7 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
                         </div>
                     </div>
                     
-                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6">
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">📄 InfoPath and SharePoint Form Automation</h3>
                         
                         <div class="grid md:grid-cols-2 gap-8">
@@ -529,7 +579,7 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
         <hr class="max-w-5xl mx-auto border-violet-900/50">
 
         <section id="contact" class="py-32 p-8 overflow-hidden">
-            <div class="max-w-4xl mx-auto text-center hidden-reveal">
+            <div class="max-w-4xl mx-auto text-center gsap-fade-in">
                 <h2 class="text-4xl font-extrabold mb-10 text-violet-400 flex items-center justify-center space-x-3">
                     <i class="fas fa-paper-plane"></i> <span>Get In Touch</span>
                 </h2>
@@ -554,30 +604,221 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
 
 
     <script>
-        // --- 1. Modal Functionality (Image Lightbox) ---
+        // ========================================
+        // GSAP SETUP & CONFIGURATION
+        // ========================================
+        
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ========================================
+        // 1. PAGE LOAD ANIMATION
+        // ========================================
+        
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+            
+            // Animate hero section on load
+            tl.from('#hero h1 span:first-child', {
+                opacity: 0,
+                y: -50,
+                duration: 0.8,
+                ease: 'power3.out'
+            })
+            .from('#hero h1 span:nth-child(2)', {
+                opacity: 0,
+                scale: 0.8,
+                duration: 1,
+                ease: 'back.out(1.7)'
+            }, '-=0.4')
+            .from('#hero p', {
+                opacity: 0,
+                y: 30,
+                duration: 0.8,
+                ease: 'power2.out'
+            }, '-=0.5')
+            .from('#hero a', {
+                opacity: 0,
+                scale: 0.9,
+                duration: 0.6,
+                ease: 'back.out(1.7)'
+            }, '-=0.3');
+        });
+
+        // ========================================
+        // 2. SCROLL-TRIGGERED ANIMATIONS
+        // ========================================
+
+        // Fade in sections
+        gsap.utils.toArray('.gsap-fade-in').forEach(section => {
+            gsap.fromTo(section, 
+                {
+                    opacity: 0,
+                    y: 50
+                },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: section,
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
+                    }
+                }
+            );
+        });
+
+        // Skills Grid - Stagger Animation
+        gsap.fromTo('#skills-grid .gsap-scale',
+            {
+                opacity: 0,
+                scale: 0.7
+            },
+            {
+                opacity: 1,
+                scale: 1,
+                duration: 0.6,
+                stagger: 0.15,
+                ease: 'back.out(1.7)',
+                scrollTrigger: {
+                    trigger: '#skills-grid',
+                    start: 'top 75%',
+                    toggleActions: 'play none none none'
+                }
+            }
+        );
+
+        // Certificates Grid - Stagger Animation
+        gsap.fromTo('#certificates-grid .gsap-slide-up',
+            {
+                opacity: 0,
+                y: 60
+            },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.2,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: '#certificates-grid',
+                    start: 'top 75%',
+                    toggleActions: 'play none none none'
+                }
+            }
+        );
+
+        // Projects - Stagger Animation
+        gsap.fromTo('#projects-container .gsap-slide-up',
+            {
+                opacity: 0,
+                y: 80
+            },
+            {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                stagger: 0.25,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: '#projects-container',
+                    start: 'top 75%',
+                    toggleActions: 'play none none none'
+                }
+            }
+        );
+
+        // ========================================
+        // 3. ENHANCED HOVER ANIMATIONS
+        // ========================================
+
+        // Content Cards Hover Effect
+        document.querySelectorAll('.content-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                gsap.to(card, {
+                    y: -12,
+                    scale: 1.02,
+                    duration: 0.4,
+                    ease: 'power2.out'
+                });
+            });
+
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, {
+                    y: 0,
+                    scale: 1,
+                    duration: 0.4,
+                    ease: 'power2.out'
+                });
+            });
+        });
+
+        // Button Magnetic Effect
+        document.querySelectorAll('a[href="#projects"], a[href^="mailto"], a[href^="https"]').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                gsap.to(btn, {
+                    scale: 1.08,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                gsap.to(btn, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                });
+            });
+        });
+
+        // ========================================
+        // 4. MODAL FUNCTIONALITY WITH GSAP
+        // ========================================
 
         const modal = document.getElementById("image-modal");
         const modalImg = document.getElementById("modal-image");
-        const closeModal = document.getElementById("modal-close");
+        const closeModalBtn = document.getElementById("modal-close");
 
         function openModal(src) {
             modal.style.display = "flex"; 
             modal.style.alignItems = "center";
             modal.style.justifyContent = "center";
             modalImg.src = src;
+            
+            // GSAP Animation for modal
+            gsap.fromTo(modal, 
+                { opacity: 0 },
+                { opacity: 1, duration: 0.3, ease: 'power2.out' }
+            );
+            
+            gsap.fromTo(modalImg,
+                { scale: 0.8, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.4, ease: 'back.out(1.7)' }
+            );
         }
 
-        closeModal.onclick = function() {
-            modal.style.display = "none";
+        function closeModal() {
+            gsap.to(modal, {
+                opacity: 0,
+                duration: 0.3,
+                ease: 'power2.in',
+                onComplete: () => {
+                    modal.style.display = "none";
+                }
+            });
         }
+
+        closeModalBtn.onclick = closeModal;
 
         window.onclick = function(event) {
             if (event.target == modal) {
-                modal.style.display = "none";
+                closeModal();
             }
         }
 
-        // Attach modal function to all certificate images (for clean code)
+        // Attach modal function to all certificate images
         document.querySelectorAll('.certificate-image').forEach(img => {
             img.addEventListener('click', () => {
                 openModal(img.src);
@@ -585,140 +826,230 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
         });
 
 
-        // --- 2. Three.js Simple Animation (Hero Background) ---
-        // Enhanced 3D object for better visual depth
+        // ========================================
+        // 5. THREE.JS & CANVAS ANIMATIONS DISABLED FOR PERFORMANCE
+        // ========================================
+        // Removed to improve performance with video background
 
-        if (typeof THREE !== 'undefined') {
-            const canvas = document.getElementById('hero-canvas');
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(window.devicePixelRatio); 
-
-            // Lighting: Subtle directional light
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(5, 5, 5);
-            scene.add(directionalLight);
-
-            const ambientLight = new THREE.AmbientLight(0x404040, 3); 
-            scene.add(ambientLight);
-
-            // Geometry and Material (Icosahedron for more complexity)
-            const geometry = new THREE.IcosahedronGeometry(2, 1); // Size 2, detail 1
-            const material = new THREE.MeshPhongMaterial({ 
-                color: 0x8b5cf6, // Violet-500
-                emissive: 0x5b21b6, // Deep violet
-                specular: 0xec4899, // Pink/Fuchsia for highlights
-                shininess: 50,
-                wireframe: true 
-            });
-
-            const icosahedron = new THREE.Mesh(geometry, material);
-            scene.add(icosahedron);
-
-            camera.position.z = 7;
-
-            // Animation loop
-            function animate() {
-                requestAnimationFrame(animate);
-
-                icosahedron.rotation.x += 0.0005;
-                icosahedron.rotation.y += 0.001;
-                icosahedron.rotation.z += 0.0007;
-
-                // Simple sine wave movement for depth perception
-                icosahedron.position.x = Math.sin(Date.now() * 0.0003) * 0.5;
-                icosahedron.position.y = Math.cos(Date.now() * 0.0005) * 0.5;
-
-                renderer.render(scene, camera);
-            }
-
-            // Handle window resize
-            window.addEventListener('resize', () => {
-                const width = window.innerWidth;
-                const height = window.innerHeight;
-
-                renderer.setSize(width, height);
-                camera.aspect = width / height;
-                camera.updateProjectionMatrix();
-            });
-
-            animate();
-        } else {
-            console.error("Three.js is not loaded. The 3D background will not render.");
-        }
-
-// ----------------------
-// Galaxy Background Motion
-// ----------------------
-const starsCanvas = document.getElementById("stars-canvas");
-const starsCtx = starsCanvas.getContext("2d");
-
-let w, h;
-let particles = [];
-
-function initStarsCanvas() {
-    w = starsCanvas.width = window.innerWidth;
-    h = starsCanvas.height = window.innerHeight;
-
-    particles = [];
-
-    for (let i = 0; i < 350; i++) {
-        particles.push({
-            x: Math.random() * w,
-            y: Math.random() * h,
-            z: Math.random() * 2 + 0.2,
-            size: Math.random() * 1.8,
-            color: `rgba(180, 80, 255, ${Math.random() * 0.8})`
-        });
-    }
-}
-initStarsCanvas();
-
-function renderGalaxy() {
-    starsCtx.clearRect(0, 0, w, h);
-
-    particles.forEach(p => {
-        p.x += (0.2 * p.z);
-        p.y += (0.1 * p.z);
-
-        if (p.x > w) p.x = 0;
-        if (p.y > h) p.y = 0;
-
-        starsCtx.beginPath();
-        starsCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        starsCtx.fillStyle = p.color;
-        starsCtx.fill();
-    });
-
-    requestAnimationFrame(renderGalaxy);
-}
-
-renderGalaxy();
-
-window.addEventListener("resize", initStarsCanvas);
-
-        // --- 3. Scroll Reveal Animation Functionality ---
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible-reveal');
-                    entry.target.classList.remove('hidden-reveal');
-                    // Stop observing after the element is visible
-                    observer.unobserve(entry.target); 
+        // ========================================
+        // 8. SMOOTH SCROLL WITH GSAP
+        // ========================================
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                e.preventDefault();
+                const target = document.querySelector(href);
+                
+                if (target) {
+                    gsap.to(window, {
+                        duration: 1.2,
+                        scrollTo: {
+                            y: target,
+                            offsetY: 80
+                        },
+                        ease: 'power3.inOut'
+                    });
                 }
             });
-        }, {
-            // Options: when 10% of the element is visible, trigger the animation
-            threshold: 0.1 
         });
 
-        document.querySelectorAll('.hidden-reveal').forEach(element => {
-            observer.observe(element);
+        // ========================================
+        // 9. CLICK ANIMATIONS FOR ALL ELEMENTS
+        // ========================================
+        
+        // Add click animations to all interactive elements
+        function addClickAnimation(element, animationType = 'default') {
+            element.addEventListener('click', function(e) {
+                // Prevent multiple animations on same element
+                if (this.classList.contains('animating')) return;
+                
+                this.classList.add('animating');
+                
+                switch(animationType) {
+                    case 'pulse':
+                        gsap.timeline()
+                            .to(this, {
+                                scale: 1.15,
+                                duration: 0.2,
+                                ease: 'power2.out'
+                            })
+                            .to(this, {
+                                scale: 1,
+                                duration: 0.3,
+                                ease: 'elastic.out(1, 0.5)',
+                                onComplete: () => this.classList.remove('animating')
+                            });
+                        break;
+                    
+                    case 'rotate':
+                        gsap.timeline()
+                            .to(this, {
+                                rotation: 360,
+                                scale: 1.1,
+                                duration: 0.6,
+                                ease: 'power2.inOut'
+                            })
+                            .to(this, {
+                                rotation: 0,
+                                scale: 1,
+                                duration: 0.3,
+                                ease: 'power2.out',
+                                onComplete: () => this.classList.remove('animating')
+                            });
+                        break;
+                    
+                    case 'bounce':
+                        gsap.timeline()
+                            .to(this, {
+                                y: -20,
+                                duration: 0.3,
+                                ease: 'power2.out'
+                            })
+                            .to(this, {
+                                y: 0,
+                                duration: 0.4,
+                                ease: 'bounce.out',
+                                onComplete: () => this.classList.remove('animating')
+                            });
+                        break;
+                    
+                    case 'shake':
+                        gsap.timeline()
+                            .to(this, {
+                                x: -10,
+                                duration: 0.1,
+                                ease: 'power2.inOut'
+                            })
+                            .to(this, {
+                                x: 10,
+                                duration: 0.1,
+                                ease: 'power2.inOut'
+                            })
+                            .to(this, {
+                                x: -10,
+                                duration: 0.1,
+                                ease: 'power2.inOut'
+                            })
+                            .to(this, {
+                                x: 0,
+                                duration: 0.1,
+                                ease: 'power2.out',
+                                onComplete: () => this.classList.remove('animating')
+                            });
+                        break;
+                    
+                    case 'glow':
+                        gsap.timeline()
+                            .to(this, {
+                                boxShadow: '0 0 30px rgba(139, 92, 246, 0.8), 0 0 60px rgba(236, 72, 153, 0.6)',
+                                scale: 1.05,
+                                duration: 0.3,
+                                ease: 'power2.out'
+                            })
+                            .to(this, {
+                                boxShadow: '0 0 0px rgba(139, 92, 246, 0)',
+                                scale: 1,
+                                duration: 0.4,
+                                ease: 'power2.in',
+                                onComplete: () => this.classList.remove('animating')
+                            });
+                        break;
+                    
+                    default:
+                        gsap.timeline()
+                            .to(this, {
+                                scale: 0.95,
+                                duration: 0.1,
+                                ease: 'power2.in'
+                            })
+                            .to(this, {
+                                scale: 1.05,
+                                duration: 0.2,
+                                ease: 'power2.out'
+                            })
+                            .to(this, {
+                                scale: 1,
+                                duration: 0.2,
+                                ease: 'elastic.out(1, 0.3)',
+                                onComplete: () => this.classList.remove('animating')
+                            });
+                }
+            });
+        }
+
+        // Apply animations to different element types
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation links - bounce animation
+            document.querySelectorAll('nav a').forEach(link => {
+                addClickAnimation(link, 'bounce');
+            });
+
+            // Content cards - glow animation
+            document.querySelectorAll('.content-card').forEach(card => {
+                addClickAnimation(card, 'glow');
+            });
+
+            // Skill cards - rotate animation
+            document.querySelectorAll('#skills-grid .content-card').forEach(skill => {
+                addClickAnimation(skill, 'rotate');
+            });
+
+            // Certificate images - pulse animation
+            document.querySelectorAll('.certificate-image').forEach(img => {
+                addClickAnimation(img, 'pulse');
+            });
+
+            // Project images - shake animation
+            document.querySelectorAll('.project-image-container').forEach(project => {
+                addClickAnimation(project, 'shake');
+            });
+
+            // Buttons - pulse animation
+            document.querySelectorAll('a[href="#projects"], a[href^="mailto"], a[href^="https"]').forEach(btn => {
+                addClickAnimation(btn, 'pulse');
+            });
+
+            // Tag badges - default animation
+            document.querySelectorAll('.tag-badge').forEach(tag => {
+                addClickAnimation(tag, 'default');
+            });
+
+            // Profile image - rotate animation
+            document.querySelectorAll('img[alt="Professional Portrait"]').forEach(img => {
+                addClickAnimation(img, 'rotate');
+            });
+
+            // Hero section title - glow animation
+            document.querySelector('#hero h1').addEventListener('click', function() {
+                gsap.timeline()
+                    .to(this, {
+                        scale: 1.1,
+                        textShadow: '0 0 20px rgba(139, 92, 246, 0.8), 0 0 40px rgba(236, 72, 153, 0.6)',
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    })
+                    .to(this, {
+                        scale: 1,
+                        textShadow: '0 0 0px rgba(139, 92, 246, 0)',
+                        duration: 0.4,
+                        ease: 'power2.in'
+                    });
+            });
+
+            console.log('%c✨ Click animations added to all elements!', 'color: #10b981; font-weight: bold; font-size: 14px;');
         });
+
+        // ========================================
+        // 10. PERFORMANCE MONITORING
+        // ========================================
+        
+        // Log GSAP animations for debugging
+        console.log('%c✅ GSAP Animations Initialized', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
+        console.log('%c✅ ScrollTrigger Plugin Active', 'color: #8b5cf6; font-weight: bold; font-size: 14px;');
+        console.log('%c✅ All animations optimized and ready!', 'color: #10b981; font-weight: bold; font-size: 14px;');
 
     </script>
 </body>
