@@ -18,7 +18,11 @@
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background-color: lab(2.75381 0 0); /* Dark red/black background using lab color */
+            background-image: url('background video/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             color: lab(98.26 0 0);
             scroll-behavior: smooth;
         }
@@ -118,20 +122,7 @@
     display: none; /* Disabled for performance */
 }
 
-        /* Video Background Styling */
-        #background-video {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
-            z-index: -2;
-            opacity: 0.4; /* Adjust opacity for better text readability */
-        }
+
 
         /* Custom animation for Hero text */
         @keyframes pulse-gradient {
@@ -195,11 +186,7 @@
 </head>
 <body class="antialiased">
 
-    <!-- Video Background -->
-    <video autoplay muted loop playsinline id="background-video">
-        <source src="background video/background 1.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+
 
     <canvas id="hero-canvas"></canvas>
     <canvas id="stars-canvas"></canvas>
@@ -408,6 +395,7 @@
                 <h2 class="text-4xl font-extrabold mb-16 text-center text-violet-400 flex items-center justify-center space-x-3">
                     <i class="fas fa-desktop"></i> <span>Featured Projects</span>
                 </h2>
+                
                 <div class="space-y-16" id="projects-container"> 
                 
                     <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
@@ -435,6 +423,91 @@
                             <span class="tag-badge bg-violet-700">Data Mapping</span>
                         </div>
                     </div>
+                    <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
+    <div class="max-w-4xl mx-auto">
+    
+    <div class="content-card rounded-2xl p-6 shadow-3xl space-y-5 gsap-slide-up">
+        
+        <h3 class="text-2xl font-bold text-fuchsia-400 mb-3">
+            🏡 Real Estate Platform – Full Stack Project
+        </h3>
+        
+        <!-- 🔥 الصور -->
+        <div class="grid grid-cols-2 gap-4">
+            
+            <div class="project-image-container" onclick="openModal('public/r1.png')">
+                <img src="public/s15.png" class="project-image">
+            </div>
+            
+            <div class="project-image-container" onclick="openModal('public/r2.png')">
+                <img src="public/s18.png" class="project-image">
+            </div>
+            
+            <div class="project-image-container" onclick="openModal('public/r3.png')">
+                <img src="public/s17.png" class="project-image">
+            </div>
+            
+            <div class="project-image-container" onclick="openModal('public/r4.png')">
+                <img src="public/s19.png" class="project-image">
+            </div>
+            
+        </div>
+
+        <p class="text-gray-300 text-base leading-relaxed">
+            Developed a full-stack real estate platform tailored for the Saudi market, featuring secure authentication with OTP verification, advanced property filtering, booking system, admin dashboard, and multi-language support (Arabic/English). Built with scalability and performance in mind.
+        </p>
+
+        <div class="flex flex-wrap gap-2">
+            <span class="tag-badge bg-violet-700">Next.js</span>
+            <span class="tag-badge bg-violet-700">TypeScript</span>
+            <span class="tag-badge bg-violet-700">MySQL</span>
+            <span class="tag-badge bg-violet-700">Prisma</span>
+            <span class="tag-badge bg-violet-700">JWT</span>
+            <span class="tag-badge bg-violet-700">Tailwind CSS</span>
+            <span class="tag-badge bg-violet-700">Full Stack</span>
+        </div>
+
+    </div>
+
+</div>
+    <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">
+        🛡️ Sanad – Smart Elderly Care App
+    </h3>
+    
+    <!-- 🔥 4 صور -->
+    <div class="grid grid-cols-2 gap-6">
+        
+        <div class="project-image-container" onclick="openModal('public/s11.jpg')">
+            <img src="public/s11.jpeg" class="project-image">
+        </div>
+        
+        <div class="project-image-container" onclick="openModal('public/s12.jpg')">
+            <img src="public/s12.jpeg" class="project-image">
+        </div>
+        
+        <div class="project-image-container" onclick="openModal('public/s13.jpg')">
+            <img src="public/s13.jpeg" class="project-image">
+        </div>
+        
+        <div class="project-image-container" onclick="openModal('public/s14.jpg')">
+            <img src="public/s14.jpeg" class="project-image">
+        </div>
+        
+    </div>
+
+    <p class="text-gray-300 text-lg leading-relaxed">
+        Core Achievement: Built a smart iOS application designed to support elderly users through medication reminders, emergency assistance, and real-time location sharing — transforming daily safety into a simple and reliable digital experience.
+    </p>
+
+    <div>
+        <span class="tag-badge bg-violet-700">iOS Development</span>
+        <span class="tag-badge bg-violet-700">SwiftUI</span>
+        <span class="tag-badge bg-violet-700">CoreLocation</span>
+        <span class="tag-badge bg-violet-700">UserNotifications</span>
+        <span class="tag-badge bg-violet-700">MVVM</span>
+    </div>
+
+</div>
           <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🤖 Saudi AI Assistant – Voice & Chat Intelligence System</h3>
                         
@@ -468,6 +541,51 @@ It was built with a modern UI, seamless API integration, and optimized prompt en
                             <span class="tag-badge bg-violet-700">Prompt Engineering</span>
                         </div>
                     </div>
+                    <div class="max-w-4xl mx-auto">
+    
+    <div class="content-card rounded-2xl p-6 shadow-3xl space-y-5 gsap-slide-up">
+        
+        <h3 class="text-2xl font-bold text-fuchsia-400 mb-3">
+            🐟 Al Bahhar Al Awwal – Seafood Restaurant Website
+        </h3>
+        
+        <!-- 🔥 4 صور -->
+        <div class="grid grid-cols-2 gap-4">
+            
+            <div class="project-image-container" onclick="openModal('public/s20.png')">
+                <img src="public/s20.png" class="project-image">
+            </div>
+            
+            <div class="project-image-container" onclick="openModal('public/s21.png')">
+                <img src="public/s21.png" class="project-image">
+            </div>
+            
+            <div class="project-image-container" onclick="openModal('public/s22.png')">
+                <img src="public/s22.png" class="project-image">
+            </div>
+            
+            <div class="project-image-container" onclick="openModal('public/s23.png')">
+                <img src="public/s23.png" class="project-image">
+            </div>
+            
+        </div>
+
+        <p class="text-gray-300 text-base leading-relaxed">
+            Developed a modern, responsive Arabic website for a premium seafood restaurant in Jeddah. The project features an elegant ocean-themed UI, RTL support, interactive menu, animated offers, customer reviews, photo gallery, and integrated Google Maps for location. Built for performance, user experience, and real-world business use.
+        </p>
+
+        <div class="flex flex-wrap gap-2">
+            <span class="tag-badge bg-violet-700">HTML5</span>
+            <span class="tag-badge bg-violet-700">CSS3</span>
+            <span class="tag-badge bg-violet-700">JavaScript</span>
+            <span class="tag-badge bg-violet-700">Responsive Design</span>
+            <span class="tag-badge bg-violet-700">RTL</span>
+            <span class="tag-badge bg-violet-700">UI/UX</span>
+        </div>
+
+    </div>
+
+</div>
                     <div class="content-card rounded-2xl p-8 shadow-3xl space-y-6 gsap-slide-up">
                         <h3 class="text-3xl font-bold text-fuchsia-400 mb-4">🛠️ Personal Car Tools E-commerce Store (Full-Stack)</h3>
                         
